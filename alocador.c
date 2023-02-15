@@ -63,7 +63,7 @@ void *bestFit(long int num_bytes)
         info[1] = num_bytes;
         // Aloca o espaco necessario do bloco
         void *endereco = &info[2];
-        topoHeapHeap += num_bytes + (2 * 8);
+        brk((char *)topoAtual + 16 + num_bytes);
         return ((char *)endereco);
     }
     else

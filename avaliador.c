@@ -81,8 +81,7 @@ int main()
   printMapa();
 
   printf("\nEstado Final:\n");
-  printMapa();
-
   finalizaAlocador();
+  printMapa();  
   return 0;
 }

@@ -21,55 +21,59 @@ void finalizaAlocador(void)
 
 void *bestFit(long int num_bytes)
 {
-    // Retorna NULL caso entrada seja inválida
-    if (num_bytes <= 0)
-        return NULL;
+    long int *bestfit = NULL;
+    long int bftam = 0xffffff;
+    long int *a = topoInicialHeap;
+    void *topoAtual = sbrk(0);
 
-    long bestFit = 0L;
-
-    void *temp = topoInicialHeap;
-    long *topo = sbrk(0);
-    void *block_start = topo;
-    long int *isDisp;
-    long int mult;
-    long int excesso;
-
-    // Percorre a Heap procurando bloco livre, respeitando best fit, para ser alocado
-    while (temp < topo)
+    while (a != topoAtual)
     {
-        if (!temp[0] && (temp[1] >= num_bytes) && ((temp[1] < bestFit) || !bestFit))
+        if (a[0] == 0)
         {
-            bestFit = temp[1];
-            block_start = temp;
+            if (a[1] >= num_bytes)
+            {
+                if (a[1] < bftam)
+                {
+                    bftam = a[1];
+                    bestfit = a;
+                }
+            }
         }
-        temp = (long *)((char *)temp + 16 + temp[1]);
+        a += 2 + (a[1] / 8);
     }
 
-    // Retorna endereço(ponteiro) caso algum bloco livre foi achado atendendo os quesitos
-    if (bestFit)
+   if(topoInicialHeap + num_bytes > topoAtual)
+   {
+        int alocaTrue = topoAtual - topoInicialHeap;
+        alocaTrue = num_bytes - alocaTrue;
+        int valorsbrk = ((alocaTrue/4096) + 1)*4096;
+        sbrk(valorsbrk);
+        sbrk(0);
+    }
+
+    if (!bestfit)
     {
-        isDisp = block_start;
-        *isDisp = 1;
-        return block_start + 16;
+        long int *info;
+        // abre 8 bytes para um long que indica se o bloco esta ocupado
+        info = sbrk(0);
+        info[0] = 1;
+        // abre outros 8 bytes para guardar o tamanho do bloco
+        info[1] = num_bytes;
+        // aloca o espaco necessario do bloco
+        void *endereco = &info[2];
+        topoHeapHeap += num_bytes + (2*8);
+        return ((char *)endereco);
     }
-
-    // Aloca quanta memória a mais for necessária
-    if ((16 + num_bytes) > (sbrk(0) - topo))
+    else
     {
-        excesso = 16 + num_bytes - (sbrk(0) - topo);
-        mult = 1 + ((excesso - 1) / 4096); // utiliza blocos de 4096 bytes, especificação 6.2c
-        sbrk(4096 * mult);                 // aloca bloco de tamanho 4096*n
+        bestfit[0] = 1;
+        bestfit[1] = bftam;
+        // bestfit + 16 bytes
+        return ((char *)&bestfit[2]);
     }
-
-    // Sinaliza como ocupado e armazena tam de memória a ser alocado
-    brk((char *)topo + 16 + num_bytes);
-    topo[0] = 1L;
-    topo[1] = num_bytes;
-
-    return &topo[2];
 }
 
-void *firstFit(int num_bytes)
+void *firstFit(long int num_bytes)
 {
     long *topo = sbrk(0);
     long *temp = topoInicialHeap;
@@ -112,7 +116,7 @@ void *firstFit(int num_bytes)
     return &topo[2];
 }
 
-void *nextFit(int num_bytes)
+void *nextFit(long int num_bytes)
 {
     long *topo = sbrk(0);
     long *temp = prevAlloc;

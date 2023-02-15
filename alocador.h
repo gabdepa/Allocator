@@ -52,7 +52,7 @@ void printMapa(void);
  * @param num_bytes Quantidade de bytes a ser alocado
  * @return Endereço do novo bloco alocado 
 */
-void *nextFit(int num_bytes);
+void *nextFit(long int num_bytes);
 
 /**
  * @brief Implementa o First Fit, alocando um bloco de "num_bytes"
@@ -63,7 +63,7 @@ void *nextFit(int num_bytes);
  * @param num_bytes Quantidade de bytes a ser alocado
  * @return Endereço do novo bloco alocado 
 */
-void *firstFit(int num_bytes);
+void *firstFit(long int num_bytes);
 
 
 

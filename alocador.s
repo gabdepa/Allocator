@@ -1,16 +1,13 @@
 .section .data
     topoInicialHeap:    .quad 0
-    topoBlocos:         .quad 0
     prevAlloc:          .quad 0
-    .equ INCREMENT, 4096
-    .equ TAM_HEADER, 16
-    
+    tamAloc:            .quad 0
+    topoAtualHeap:      .quad 0
+        
 .globl topoInicialHeap
 .globl prevAlloc
-.globl topoBlocos
 
     str_init:           .string "Init printf() heap arena\n"
-    str_cabc:           .string "################"
     plus_char:          .byte 43
     minus_char:         .byte 45
 
@@ -32,8 +29,6 @@ iniciaAlocador:
     syscall                    # brk(0)
     movq %rax, topoInicialHeap # topo da heap (retorno de brk)
     movq %rax, prevAlloc       # prevAlloc := topoInicialHeap
-    
-    movq %rax, topoBlocos      # topoBlocos = sbrk(0) adicionado para best fit
 
     popq %rbp
     ret
@@ -297,164 +292,83 @@ firstFit:
 .globl bestFit
 bestFit:
     pushq %rbp
-    movq %rsp, %rbp
+    movq  %rsp, %rbp
 
-    #   -8(%rbp)  long int bestFit;
-    #   -16(%rbp) long int *cabecalho;
-    #   -24(%rbp) void *iterator;
-    #   -32(%rbp) void *comecoBloco;
-    #   -40(%rbp) long int *isDisp;
-    #   -48(%rbp) long int disp;
-    #   -56(%rbp) long int mult;
-    #   -64(%rbp) long int excesso;
-    #   -72(%rbp) long int *bloco;
-    #   -80(%rbp) long int *brk
-    #   -88(%rbp) long int num_bytes
-    subq $88, %rsp
+    mov %rdi, tamAloc            # salva o tamanho da alocacao
+    mov topoInicialHeap, %r10    # Salva o topo da heap em r10
+
+    mov  $12, %rax               # codigo referente ao brk
+    mov  $0 , %rdi               # 0 para retornar o topo da heap
+    syscall                      # executa a sycall
+    movq %rax, topoAtualHeap     # retorno em %rax e salvo em topoAtualHeap
+
+    w0: 
+        cmpq %r10 , topoAtualHeap         # compara o topo inicial (r10) com o topo atual (rax)
+        je fim_w0
+
+        mov (%r10), %r15                  # bloco de "livre ou não"  -> r15
+        cmp $0    , %r15                  # se ocupado, procura proximo bloco
+        jne prox_bloc_1
+
+        mov %r10     , %r14               # compara se o tamanho disponível é o suficiente para alocar 
+        add $8       , %r10               # o novo tamanho
+        mov (%r10)   , %r15 
+        cmpq tamAloc , %r15
+        jl  prox_bloc_2
+
+        mov $1      ,  %r13               # se nao está ocupado e tem tamanho o suficiente 
+        mov %r13    , (%r14)
+        movq tamAloc,  %r14
+        mov %r14    , (%r15)
+
+        add $8      , %r15 
+
+        mov %r15    , %rax 
+        
+
+        jmp fim_aloc             # Termina a alocação
+
+        prox_bloc_1:
+        add $8       , %r10
+        mov (%r10)   , %r15
+
+        prox_bloc_2:
+        add $8       , %r10
+
+        add %r15     , %r10
+
+        jmp w0
+
+    fim_w0:
+    # Não tinha um espaço disponivel, é necessário alocar um novo
+
+    mov  $12, %rax               # codigo referente ao brk
+    mov  $0 , %rdi               # 0 para retornar o topo da heap
+    syscall                      # executa a sycall
+
+    mov %rax    , %r15           # salva o local atual
     
-    #  Salva variáveis locais na stack
-    movq %rdi, -88(%rbp)
+   
+    addq tamAloc, %rax           # soma o tamanho da alocação
+    add  $16    , %rax           # soma o espaço do cabecalho
 
-    
-    cmpq $0, %rdi   # if (num_bytes <= 0) return NULL
-    jge bf_fimIf1
+    mov %rax    , %rdi           # move o tamanho para a chamado do brk
+    mov  $12    , %rax           # codigo referente ao brk
+    syscall                      # executa a sycall
 
-    movq $0, %rax
+    mov $1       ,  %r14         # a[0] espaco alocado
+    mov %r14     , (%r15)        #
+    add $8       ,  %r15         # a[1]
+    movq tamAloc ,  %r14         # 
+    mov %r14     , (%r15)        # a[1] = tamanho
+    mov %r15     , %rax
+    add $8       , %rax
+
+    fim_aloc:
+
     popq %rbp
-    ret
 
-    bf_fimIf1:
-    movq $0, -8(%rbp)
-    movq topoInicialHeap, %r8
-    movq %r8, -24(%rbp)
-    movq topoBlocos, %r8
-    movq %r8, -32(%rbp)
-
-    
-    bf_while:       #  while (iterator < topoBlocos)
-    movq -24(%rbp), %r8
-    movq topoBlocos, %r9
-    cmpq %r9, %r8
-    jge bf_fimwhile
-
-    
-    movq %r8, -16(%rbp) #  cabecalho = iterator
-    
-    
-    movq (%r8), %r8 #  if !cabecalho[0]
-    movq $0, %r9
-    cmpq %r9, %r8
-    jne bf_fimIf
-
-    
-    movq -16(%rbp), %r8 #  if cabecalho[1] >= num_bytes
-    movq 8(%r8), %r8
-    movq -88(%rbp), %rdi
-    cmpq %rdi, %r8
-    jl bf_fimIf
-
-    
-    movq -8(%rbp), %r9  # if ((cabecalho[1] < bestFit) || !bestFit)
-    cmpq %r9, %r8
-    jl bf_dentroIf
-    
-    movq $0, %r10
-    cmpq %r9, %r10
-    jne bf_fimIf
-
-    bf_dentroIf:
-    movq %r8, -8(%rbp) # bestFit = cabecalho[1]
-
-    
-    movq -24(%rbp), %r9 #  comecoBloco = iterator
-    movq %r9, -32(%rbp)
-
-    bf_fimIf:
-    movq -16(%rbp), %r8 #  iterator += TAM_HEADER + cabecalho[1]
-    movq 8(%r8), %r8
-    addq $TAM_HEADER, %r8
-    addq %r8, -24(%rbp)
-
-    jmp bf_while
-
-    bf_fimwhile:
-    movq -8(%rbp), %r8  #  if (bestfit)
-    movq $0, %r9
-    cmpq %r9, %r8
-    je bf_fimIf2
-
-    
-    movq -32(%rbp), %r8 #  isDisp = comecobloco
-    
-    movq $1, (%r8) #  *isDisp = 1
-
-    
-    addq $TAM_HEADER, %r8 #  return comecoBloco + TAM_HEADER
-    movq %r8, %rax
-
-    addq $88, %rsp
-    popq %rbp
-    ret
-
-    bf_fimIf2:
-
-    movq $0, %rdi #  sbrk(0)
-    movq $12, %rax
-    syscall
-    movq %rax, -80(%rbp)
-
-    
-    movq topoBlocos, %r8 #  disp = sbrk(0) - topoBlocos
-    subq %rax, %r8
-    movq %r8, -48(%rbp)
-
-    
-    movq $TAM_HEADER, %r8 #  if (TAM_HEADER + num_bytes > disp)
-    movq -88(%rbp), %rdi
-    addq %rdi, %r8
-    movq -48(%rbp), %r9
-    cmpq %r9, %r8
-    jle bf_endif3
-
-    
-    subq %r9, %r8 # excesso = TAM_HEADER + num_bytes - disp
-    movq %r8, -64(%rbp)
-    
-    subq $1, %r8 #  mult = 1 + ((excesso - 1)/INCREMENT)
-    movq %r8, %rax
-    xor %rdx, %rdx
-    movq $INCREMENT, %r9
-    idiv %r9
-    addq $1, %rax
-    imul $INCREMENT, %rax
-
-    
-    addq -80(%rbp), %rax #  sbrk(INCREMENT * mult)
-    movq %rax, %rdi
-    movq $12, %rax
-    syscall
-
-    bf_endif3: #  bloco = topoBlocos
-    movq topoBlocos, %r8
-    movq %r8, -72(%rbp)
-    
-    movq $1, (%r8) #  bloco[0] = 1
-    
-    movq -88(%rbp), %rdi #  bloco[1] = num_bytes
-    movq %rdi, 8(%r8)
-    
-    movq topoBlocos, %r9 #  topoBlocos += TAM_HEADER + num_bytes
-    addq $TAM_HEADER, %r9
-    addq %rdi, %r9
-    movq %r9, topoBlocos
-
-    
-    movq -72(%rbp), %rax #  return bloco + HEADER_SIZE
-    addq $TAM_HEADER, %rax
-    
-    addq $88, %rsp
-    popq %rbp
-    ret
+ret
 
 
 .globl liberaMem

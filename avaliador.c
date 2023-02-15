@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "alocador.h"
 
-int main(long int argc, char **argv)
+int main()
 {
   void *a, *b, *c, *d, *e;
 

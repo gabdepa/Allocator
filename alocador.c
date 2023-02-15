@@ -85,12 +85,12 @@ void *firstFit(int num_bytes)
     long *temp = topoInicialHeap;
     long *maior = temp;
 
-    // seleciona primeiro bloco livre como maior
+    // Seleciona primeiro bloco livre como maior
     while (temp != topo && (maior[0] == 1 && temp[0] == 1))
         temp = (long *)((char *)temp + 16 + temp[1]);
     maior = temp;
 
-    // itera a heap em busca do maior bloco (até o fim)
+    // Itera a heap em busca do maior bloco até o fim
     while (temp != topo)
     {
         if (temp[0] == 0L && temp[1] > maior[1])
@@ -98,11 +98,11 @@ void *firstFit(int num_bytes)
         temp = (long *)((char *)temp + 16 + temp[1]);
     }
 
-    // aloca o bloco de tam num_bytes no 'maior' e se sobrar espaço particiona o bloco //
+    // Aloca o bloco de tam num_bytes no 'maior' e se sobrar espaço particiona o bloco //
     if (maior != topo && (maior[1] >= num_bytes + 16))
     {
         maior[0] = 1L;
-        // verifica se é possível particionar o bloco
+        // Verifica se é possível particionar o bloco
         if (maior[1] >= num_bytes + 16)
         {
             long *novoBloco = (long *)((char *)maior + 16 + num_bytes);
@@ -114,7 +114,7 @@ void *firstFit(int num_bytes)
         return &maior[2];
     }
 
-    // sinaliza como ocupado e armazena tam de memória a ser alocado
+    // Sinaliza como ocupado e armazena tam de memória a ser alocado
     brk((char *)topo + 16 + num_bytes);
     topo[0] = 1L;
     topo[1] = num_bytes;
@@ -137,7 +137,7 @@ void *nextFit(int num_bytes)
             {
                 temp[0] = 1L;
 
-                // verifica se é possível particionar o bloco
+                // Verifica se é possível particionar o bloco
                 if (temp[1] >= num_bytes + 16)
                 {
                     long *novoBloco = (long *)((char *)temp + 16 + num_bytes);
@@ -155,7 +155,7 @@ void *nextFit(int num_bytes)
         ++retry;
     }
 
-    // sinaliza como ocupado e armazena tam de memória a ser alocado
+    // Sinaliza como ocupado e armazena tam de memória a ser alocado
     brk((char *)topo + 16 + num_bytes);
     topo[0] = 1L;
     topo[1] = num_bytes;
@@ -207,9 +207,9 @@ void printMapa(void)
     {
         printf("################");
         if (count[0] == 1)
-            c = '*'; // ocupado
+            c = '+'; // ocupado
         else
-            c = '~'; //livre
+            c = '-'; //livre
         for (int i = 0; i < count[1]; i++)
             putchar(c);
 

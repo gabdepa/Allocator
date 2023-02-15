@@ -306,10 +306,10 @@ bestFit:
     #   -80(%rbp) long int *brk
     #   -88(%rbp) long int num_bytes
 
-    // salva parâmetro na stack
+    #  salva parâmetro na stack
     movq %rdi, -88(%rbp)
 
-    // if (num_bytes <= 0) return NULL
+    # if (num_bytes <= 0) return NULL
     cmpq $0, %rdi
     jge bf_fimIf1
 
@@ -323,30 +323,30 @@ bestFit:
     movq topoBlocos, %r8
     movq %r8, -32(%rbp)
 
-    // while (iterator < topoBlocos)
+    #  while (iterator < topoBlocos)
     bf_while:
     movq -24(%rbp), %r8
     movq topoBlocos, %r9
     cmpq %r9, %r8
     jge bf_fimwhile
 
-    // cabecalho = iterator
+    #  cabecalho = iterator
     movq %r8, -16(%rbp)
     
-    // if !cabecalho[0]
+    #  if !cabecalho[0]
     movq (%r8), %r8
     movq $0, %r9
     cmpq %r9, %r8
     jne bf_fimIf
 
-    // if cabecalho[1] >= num_bytes
+    #  if cabecalho[1] >= num_bytes
     movq -16(%rbp), %r8
     movq 8(%r8), %r8
     movq -88(%rbp), %rdi
     cmpq %rdi, %r8
     jl bf_fimIf
 
-    // if ((cabecalho[1] < bestFit) || !bestFit)
+    # if ((cabecalho[1] < bestFit) || !bestFit)
     movq -8(%rbp), %r9
     cmpq %r9, %r8
     jl bf_dentroIf
@@ -356,15 +356,15 @@ bestFit:
     jne bf_fimIf
 
     bf_dentroIf:
-    // bestFit = cabecalho[1]
+    # bestFit = cabecalho[1]
     movq %r8, -8(%rbp)
 
-    // comecoBloco = iterator
+    #  comecoBloco = iterator
     movq -24(%rbp), %r9
     movq %r9, -32(%rbp)
 
     bf_fimIf:
-    // iterator += TAM_HEADER + cabecalho[1]
+    #  iterator += TAM_HEADER + cabecalho[1]
     movq -16(%rbp), %r8
     movq 8(%r8), %r8
     addq $TAM_HEADER, %r8
@@ -373,18 +373,18 @@ bestFit:
     jmp bf_while
     bf_fimwhile:
 
-    // if (bestfit)
+    #  if (bestfit)
     movq -8(%rbp), %r8
     movq $0, %r9
     cmpq %r9, %r8
     je bf_fimIf2
 
-    // isDisp = comecobloco
+    #  isDisp = comecobloco
     movq -32(%rbp), %r8
-    // *isDisp = 1
+    #  *isDisp = 1
     movq $1, (%r8)
 
-    // return comecoBloco + TAM_HEADER
+    #  return comecoBloco + TAM_HEADER
     addq $TAM_HEADER, %r8
     movq %r8, %rax
 
@@ -394,18 +394,18 @@ bestFit:
 
     bf_fimIf2:
 
-    // sbrk(0)
+    #  sbrk(0)
     movq $0, %rdi
     movq $12, %rax
     syscall
     movq %rax, -80(%rbp)
 
-    // disp = sbrk(0) - topoBlocos
+    #  disp = sbrk(0) - topoBlocos
     movq topoBlocos, %r8
     subq %rax, %r8
     movq %r8, -48(%rbp)
 
-    // if (TAM_HEADER + num_bytes > disp)
+    #  if (TAM_HEADER + num_bytes > disp)
     movq $TAM_HEADER, %r8
     movq -88(%rbp), %rdi
     addq %rdi, %r8
@@ -413,10 +413,10 @@ bestFit:
     cmpq %r9, %r8
     jle bf_endif3
 
-    // excesso = TAM_HEADER + num_bytes - disp
+    # excesso = TAM_HEADER + num_bytes - disp
     subq %r9, %r8
     movq %r8, -64(%rbp)
-    // mult = 1 + ((excesso - 1)/INCREMENT)
+    #  mult = 1 + ((excesso - 1)/INCREMENT)
     subq $1, %r8
     movq %r8, %rax
     xor %rdx, %rdx
@@ -425,7 +425,7 @@ bestFit:
     addq $1, %rax
     imul $INCREMENT, %rax
 
-    // sbrk(INCREMENT * mult)
+    #  sbrk(INCREMENT * mult)
     addq -80(%rbp), %rax
     movq %rax, %rdi
     movq $12, %rax
@@ -433,21 +433,21 @@ bestFit:
 
     bf_endif3:
     
-    # bloco = topoBlocos
+    #  bloco = topoBlocos
     movq topoBlocos, %r8
     movq %r8, -72(%rbp)
-    # bloco[0] = 1
+    #  bloco[0] = 1
     movq $1, (%r8)
-    # bloco[1] = num_bytes
+    #  bloco[1] = num_bytes
     movq -88(%rbp), %rdi
     movq %rdi, 8(%r8)
-    # topoBlocos += TAM_HEADER + num_bytes
+    #  topoBlocos += TAM_HEADER + num_bytes
     movq topoBlocos, %r9
     addq $TAM_HEADER, %r9
     addq %rdi, %r9
     movq %r9, topoBlocos
 
-    # return bloco + HEADER_SIZE
+    #  return bloco + HEADER_SIZE
     movq -72(%rbp), %rax
     addq $TAM_HEADER, %rax
     
@@ -544,8 +544,8 @@ liberaMem:
     popq %rbp
     ret                        # return ret
 
-.globl imprimeMapa
-imprimeMapa:
+.globl printMapa
+printMapa:
     pushq %rbp
     movq %rsp, %rbp
     subq $24, %rsp # -8(%rbp) := a ; -16(%rbp) := topoAtual ; -24(%rbp) := c

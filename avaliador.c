@@ -32,6 +32,15 @@ int main()
   e = (void *)nextFit(40);
   printMapa();
 
+
+  // Best Fit
+  printf("BEST FIT:\n");
+  b = (void *)bestFit(50);
+  d = (void *)bestFit(90);
+  e = (void *)bestFit(40);
+  printMapa();
+
+  printf("Estado Inicial:\n");
   // Voltando ao Estado inicial
   liberaMem(c);
   printMapa();

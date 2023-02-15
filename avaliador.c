@@ -52,31 +52,35 @@ int main()
   printMapa();
 
   // Voltando ao Estado inicial
-  liberaMem(a_ff);
-
-  liberaMem(b_ff);
-
-  liberaMem(c_ff);
-
-  liberaMem(d_nf);
-
-  liberaMem(e_nf);
-
-  liberaMem(f_nf);
-
-  liberaMem(g_al);
-
-  liberaMem(h_al);
-
-  liberaMem(i_al);
-
-  liberaMem(j_bf);
-
-  liberaMem(k_bf);
-
+  // Liberando Best Fit
+  printf("Liberando Best Fit...\n");
   liberaMem(l_bf);
+  liberaMem(k_bf);
+  liberaMem(j_bf);
+  printMapa();
 
-  printf("Estado Final:\n");
+  // Liberando Alocador V2
+  printf("Liberando Alocador V2...\n");
+  liberaMem(i_al);
+  liberaMem(h_al);
+  liberaMem(g_al);
+  printMapa();
+
+  // Liberando Next Fit
+  printf("Liberando Next Fit...\n");
+  liberaMem(f_nf);
+  liberaMem(e_nf);
+  liberaMem(d_nf);
+  printMapa();
+
+  // Liberando First Fit
+  printf("Liberando First Fit...\n");
+  liberaMem(c_ff);
+  liberaMem(b_ff);
+  liberaMem(a_ff);
+  printMapa();
+
+  printf("\nEstado Final:\n");
   printMapa();
 
   finalizaAlocador();

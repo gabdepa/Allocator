@@ -6,15 +6,13 @@
 
     tamanhoBestFit:     .quad 0xffffffff
     enderecoBestFit:    .quad 0
-
-    
     
     str_init:           .string "Init printf() heap arena\n"
     str_cabc:           .string "################"
     plus_char:          .byte 43
     minus_char:         .byte 45
 
-    prevAlloc:          .quad 0 # Utilizado no next fit
+    prevAlloc:          .quad 0 # Utilizado no nextFit  e bestFit
    
 .globl topoInicialHeap
 .globl prevAlloc  

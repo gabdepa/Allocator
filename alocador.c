@@ -199,9 +199,9 @@ int liberaMem(void *block)
     long *temp = block;
     int ret = 0;
 
-    if (temp[-2] == 1L)
+    if (temp[-2] == 1L) // Se está ocupado
     {
-        temp[-2] = 0L;
+        temp[-2] = 0L; // Seta para livre
         ret = 1;
     }
 

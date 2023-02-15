@@ -19,6 +19,10 @@ void finalizaAlocador(void)
     brk(topoInicialHeap);
 }
 
+void *alocadorV2(long int num_bytes){
+    
+}
+
 void *bestFit(long int num_bytes)
 {
     long int *bestfit = NULL;
@@ -156,7 +160,7 @@ void *nextFit(long int num_bytes)
     topo[0] = 1L;
     topo[1] = num_bytes;
 
-    prevAlloc = (long *)((char *)topo + 16 + num_bytes);
+    prevAlloc = (long *)((char *)topo + 16 + num_bytes); 
 
     return &topo[2];
 }

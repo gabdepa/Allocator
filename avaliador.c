@@ -5,53 +5,65 @@
 
 int main()
 {
-  void *a, *b, *c, *d, *e;
+  void *a_ff, *b_ff, *c_ff; // ponteiros para alocação First Fit 
+  void *d_nf, *e_nf, *f_nf; // ponteiros para alocação Next Fit 
+  void *g_bf, *h_bf, *i_bf; // ponteiros para alocação Best Fit
 
-  // 0) Estado inicial
+  //Estado inicial
+  printf("Estado Inicial:\n");
   iniciaAlocador();
   printMapa();
 
   // First Fit
   printf("FIRST FIT:\n");
-  a = (void *)firstFit(100);
-  b = (void *)firstFit(130);
-  c = (void *)firstFit(120);
-  d = (void *)firstFit(110);
+  a_ff = (void *)firstFit(50);
   printMapa();
-
-  // Vizualiação da Heap
-  liberaMem(b);
+  b_ff = (void *)firstFit(90);
   printMapa();
-  liberaMem(d);
+  c_ff = (void *)firstFit(40);
   printMapa();
 
   // Next Fit
   printf("NEXT FIT:\n");
-  b = (void *)nextFit(50);
-  d = (void *)nextFit(90);
-  e = (void *)nextFit(40);
+  d_nf = (void *)nextFit(50);
   printMapa();
-
+  e_nf = (void *)nextFit(90);
+  printMapa();
+  f_nf = (void *)nextFit(40);
+  printMapa();
 
   // Best Fit
   printf("BEST FIT:\n");
-  b = (void *)bestFit(50);
-  d = (void *)bestFit(90);
-  e = (void *)bestFit(40);
+  g_bf = (void *)bestFit(50);
+  printMapa();
+  h_bf = (void *)bestFit(90);
+  printMapa();
+  i_bf = (void *)bestFit(40);
   printMapa();
 
-  printf("Estado Inicial:\n");
+  
   // Voltando ao Estado inicial
-  liberaMem(c);
-  printMapa();
-  liberaMem(a);
-  printMapa();
-  liberaMem(b);
-  printMapa();
-  liberaMem(d);
-  printMapa();
-  liberaMem(e);
+  liberaMem(a_ff);
+
+  liberaMem(b_ff);
+
+  liberaMem(c_ff);
+
+  liberaMem(d_nf);
+
+  liberaMem(e_nf);
+
+  liberaMem(f_nf);
+
+  liberaMem(g_bf);
+
+  liberaMem(h_bf);
+
+  liberaMem(i_bf);
+
+  printf("Estado Final:\n");
   printMapa();
 
   finalizaAlocador();
+  return 0;
 }

@@ -1,21 +1,6 @@
 {
     "files.associations": {
-        "stdio.h": "c",
-        "MAIN.C": "cpp",
-        "mainMAIN.C": "cpp",
-        "test.h": "c",
-        "random": "cpp",
-        "array": "c",
-        "deque": "c",
-        "list": "c",
-        "string": "c",
-        "unordered_map": "c",
-        "unordered_set": "c",
-        "vector": "c",
-        "string_view": "c",
-        "initializer_list": "c",
-        "algorithm": "c",
-        "stdbool.h": "c",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "random": "c"
     }
 }

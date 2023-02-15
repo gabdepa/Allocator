@@ -20,7 +20,32 @@ void finalizaAlocador(void)
 }
 
 void *alocadorV2(long int num_bytes){
-    
+    long int *temp = topoInicialHeap;
+    void *topoAtual = sbrk(0);
+    while(temp != topoAtual){
+        if(temp[0] == 0){ //bloco esta livre
+            if(temp[1] >= num_bytes){ //e cabe
+                long int *info;
+                // abre 8 bytes para um long que indica se o bloco esta ocupado
+                temp[0] = 1; 
+                // abre outros 8 bytes para guardar o tamanho do bloco
+                // a[1] = num_bytes; 
+                // aloca o espaco necessario do bloco
+                return ((char*)&temp[2]);
+            }
+        }
+        temp += 2 + (temp[1]/8);
+    }
+    long int *info;
+    // abre 8 bytes para um long que indica se o bloco esta ocupado
+    info = (long int *)sbrk(8);
+    *info = 1;
+    // abre outros 8 bytes para guardar o tamanho do bloco
+    info = (long int *)sbrk(8);
+    *info = num_bytes;
+    // aloca o espaco necessario do bloco
+    void *endereco = sbrk(num_bytes);
+    return ((char*)endereco);
 }
 
 void *bestFit(long int num_bytes)
@@ -67,7 +92,7 @@ void *bestFit(long int num_bytes)
         info[1] = num_bytes;
         // Aloca o espaco necessario do bloco
         void *endereco = &info[2];
-        brk((char *)topoAtual + 16 + num_bytes);
+        brk((char *)topoAtual + 16 + num_bytes); //aloca espaco para indicar tamanho e estado do bloco
         return ((char *)endereco);
     }
     else

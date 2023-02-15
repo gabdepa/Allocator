@@ -309,19 +309,19 @@ alocadorV2:
     syscall                      # executa a sycall
     movq %rax, topoAtualHeap     # retorno em %rax e salvo em topoAtualHeap
 
-    w0: 
+    v2_w0: 
         cmpq %r10 , topoAtualHeap # compara o topo inicial (r10) com o topo atual (rax)
-        je fim_w0
+        je v2_fim_w0
 
         mov (%r10), %r15          # bloco de "livre ou não"  -> r15
         cmp $0    , %r15          # se ocupado, procura proximo bloco
-        jne prox_bloc_1
+        jne v2_prox_bloc_1
 
         mov %r10     , %r14       # compara se o tamanho disponível é o suficiente para alocar 
         add $8       , %r10       # o novo tamanho
         mov (%r10)   , %r15 
         cmpq tamAloc , %r15
-        jl  prox_bloc_2
+        jl  v2_prox_bloc_2
 
         mov $1      ,  %r13       # se nao está ocupado e tem tamanho o suficiente 
         mov %r13    , (%r14)
@@ -333,20 +333,20 @@ alocadorV2:
         mov %r15    , %rax 
         
 
-        jmp fim_aloc              # Termina a alocação
+        jmp v2_fim_aloc              # Termina a alocação
 
-        prox_bloc_1:
+        v2_prox_bloc_1:
         add $8       , %r10
         mov (%r10)   , %r15
 
-        prox_bloc_2:
+        v2_prox_bloc_2:
         add $8       , %r10
 
         add %r15     , %r10
 
-        jmp w0
+        jmp v2_w0
 
-    fim_w0:
+    v2_fim_w0:
     # Não tinha um espaço disponivel, é necessário alocar um novo
 
     mov  $12, %rax               # codigo referente ao brk
@@ -375,6 +375,7 @@ alocadorV2:
     popq %rbp
 
     ret
+
 
 
 

@@ -7,8 +7,8 @@ int main()
 {
   void *a_ff, *b_ff, *c_ff; // ponteiros para alocação First Fit
   void *d_nf, *e_nf, *f_nf; // ponteiros para alocação Next Fit
-  void *g_bf, *h_bf, *i_bf; // ponteiros para alocação Best Fit
-  void *j_al, *k_al, *l_al; // ponteiros para alocação Best Fit
+  void *g_al, *h_al, *i_al; // ponteiros para alocação Best Fit
+  void *j_bf, *k_bf, *l_bf; // ponteiros para alocação Best Fit
 
   // Estado inicial
   printf("Estado Inicial:\n");
@@ -35,20 +35,20 @@ int main()
 
   // Alocador V2
   printf("ALOCADOR V2:\n");
-  j_al = (void *)alocadorV2(50);
+  g_al = (void *)alocadorV2(50);
   printMapa();
-  k_al = (void *)alocadorV2(90);
+  h_al = (void *)alocadorV2(90);
   printMapa();
-  l_al = (void *)alocadorV2(40);
+  i_al = (void *)alocadorV2(40);
   printMapa();
 
   // Best Fit
   printf("BEST FIT:\n");
-  g_bf = (void *)bestFit(50);
+  j_bf = (void *)bestFit(50);
   printMapa();
-  h_bf = (void *)bestFit(90);
+  k_bf = (void *)bestFit(90);
   printMapa();
-  i_bf = (void *)bestFit(40);
+  l_bf = (void *)bestFit(40);
   printMapa();
 
   // Voltando ao Estado inicial
@@ -64,17 +64,17 @@ int main()
 
   liberaMem(f_nf);
 
-  liberaMem(g_bf);
+  liberaMem(g_al);
 
-  liberaMem(h_bf);
+  liberaMem(h_al);
 
-  liberaMem(i_bf);
+  liberaMem(i_al);
 
-  liberaMem(j_al);
+  liberaMem(j_bf);
 
-  liberaMem(k_al);
+  liberaMem(k_bf);
 
-  liberaMem(l_al);
+  liberaMem(l_bf);
 
   printf("Estado Final:\n");
   printMapa();

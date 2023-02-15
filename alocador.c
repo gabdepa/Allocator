@@ -57,8 +57,8 @@ void *bestFit(long int num_bytes)
     long int *bestfit = NULL;
     long int bftam = 0xffffff;
     long int *a = topoInicialHeap;
-    void *topoAtual = sbrk(0);
-    while (a != topoAtual)
+    
+    while (a != prevAlloc)
     {
         if (a[0] == 0)
         {
@@ -66,33 +66,45 @@ void *bestFit(long int num_bytes)
             {
                 if (a[1] < bftam)
                 {
-                    bftam = a[1];
                     bestfit = a;
+                    bftam = a[1];
                 }
             }
         }
         a += 2 + (a[1] / 8);
     }
-    if (!bestfit)
+
+    void *topoAtual = sbrk(0); // Guarda topo da heap em uma variável para ser usada na comparação
+    if (*bestfit == NULL)
     {
-        long int *info;
-        // abre 8 bytes para um long que indica se o bloco esta ocupado
-        info = (long int *)sbrk(8);
-        *info = 1;
-        // abre outros 8 bytes para guardar o tamanho do bloco
-        info = (long int *)sbrk(8);
-        *info = num_bytes;
-        // aloca o espaco necessario do bloco
-        void *endereco = sbrk(num_bytes);
-        return ((char *)endereco);
+        if ( (num_bytes + 16) > (topoAtual - prevAlloc) )
+        {
+            int alocaTrue = topoAtual - prevAlloc; // Ve quanto espaço tem disponível no topo da heap
+            alocaTrue = num_bytes - alocaTrue;
+            int valorsbrk = ((alocaTrue / 4096) + 1) * 4096;
+            sbrk(valorsbrk);
+            sbrk(0);
+        }
     }
-    else
-    {
-        bestfit[0] = 1;
-        bestfit[1] = bftam;
-        // bestfit + 16 bytes
-        return ((char *)&bestfit[2]);
-    }
+
+    long int *info;
+    // abre 8 bytes para um long que indica se o bloco esta ocupado
+    info = (long int *)sbrk(8);
+    info[0] = 1;
+    // abre outros 8 bytes para guardar o tamanho do bloco
+    info = (long int *)sbrk(8);
+    info[1] = num_bytes;
+
+    // bestfit + 16 bytes
+    bestfit[0] = *info[0];
+    bestfit[1] = *info[1];
+
+    // aloca o espaco necessario do bloco
+    bestfit[2] = &info[2];
+
+    // Atualiza prevAlloc
+    prevAlloc = (long *)((char *)topoAtual + 16 + num_bytes)
+    return ((char *)&bestfit[2]);
 }
 
 void *firstFit(long int num_bytes)

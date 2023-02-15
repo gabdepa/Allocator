@@ -1,40 +1,41 @@
 #include <stdio.h>
 #include "alocador.h"
 
-int main (long int argc, char** argv) {
-  void *a,*b,*c,*d,*e;
+int main(long int argc, char **argv)
+{
+  void *a, *b, *c, *d, *e;
 
-  iniciaAlocador(); 
-  // imprimeMapa();
-  // 0) estado inicial
-
-  a=(void *) firstFit(100);
-  // imprimeMapa();
-  b=(void *) firstFit(130);
-  // imprimeMapa();
-  c=(void *) firstFit(120);
-  // imprimeMapa();
-  d=(void *) firstFit(110);
+  // 0) Estado inicial
+  iniciaAlocador();
   imprimeMapa();
+
   // 1) Espero ver quatro segmentos ocupados
+  a = (void *)firstFit(100);
+  // imprimeMapa();
+  b = (void *)firstFit(130);
+  // imprimeMapa();
+  c = (void *)firstFit(120);
+  // imprimeMapa();
+  d = (void *)firstFit(110);
+  imprimeMapa();
 
+  // 2) Espero ver quatro segmentos alternando  ocupados e livres
   liberaMem(b);
-  imprimeMapa(); 
+  imprimeMapa();
   liberaMem(d);
-  imprimeMapa(); 
-  // 2) Espero ver quatro segmentos alternando
-  //    ocupados e livres
+  imprimeMapa();
 
-  b=(void *) firstFit(50);
+  // 3) Deduzam
+  b = (void *)firstFit(50);
   imprimeMapa();
-  d=(void *) firstFit(90);
+  d = (void *)firstFit(90);
   imprimeMapa();
-  e=(void *) firstFit(40);
+  e = (void *)firstFit(40);
   imprimeMapa();
-  // // 3) Deduzam
-	
+
+  // 4) Volta ao estado inicial
   liberaMem(c);
-  imprimeMapa(); 
+  imprimeMapa();
   liberaMem(a);
   imprimeMapa();
   liberaMem(b);
@@ -43,7 +44,6 @@ int main (long int argc, char** argv) {
   imprimeMapa();
   liberaMem(e);
   imprimeMapa();
-  //  // 4) volta ao estado inicial
 
   finalizaAlocador();
 }

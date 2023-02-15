@@ -81,7 +81,7 @@ void *bestFit(long int num_bytes)
 void *firstFit(int num_bytes)
 {
     long *topo = sbrk(0);
-    long *temp = topoInicialHeap
+    long *temp = topoInicialHeap;
     long *maior = temp;
 
     // seleciona primeiro bloco livre como maior
@@ -89,7 +89,7 @@ void *firstFit(int num_bytes)
         temp = (long *)((char *)temp + 16 + temp[1]);
     maior = temp;
 
-    /* itera a heap em busca do maior bloco (até o fim) */
+    // itera a heap em busca do maior bloco (até o fim)
     while (temp != topo)
     {
         if (temp[0] == 0L && temp[1] > maior[1])
@@ -97,12 +97,11 @@ void *firstFit(int num_bytes)
         temp = (long *)((char *)temp + 16 + temp[1]);
     }
 
-    /* aloca o bloco de tam num_bytes no 'maior' e se sobrar espaço
-     * particiona o bloco */
+    // aloca o bloco de tam num_bytes no 'maior' e se sobrar espaço particiona o bloco //
     if (maior != topo && (maior[1] >= num_bytes + 16))
     {
         maior[0] = 1L;
-        /* verifica se é possível particionar o bloco */
+        // verifica se é possível particionar o bloco
         if (maior[1] >= num_bytes + 16)
         {
             long *novoBloco = (long *)((char *)maior + 16 + num_bytes);
@@ -114,7 +113,7 @@ void *firstFit(int num_bytes)
         return &maior[2];
     }
 
-    /* sinaliza como ocupado e armazena tam de memória a ser alocado */
+    // sinaliza como ocupado e armazena tam de memória a ser alocado
     brk((char *)topo + 16 + num_bytes);
     topo[0] = 1L;
     topo[1] = num_bytes;
@@ -124,7 +123,7 @@ void *firstFit(int num_bytes)
 
 void *nextFit(int num_bytes)
 {
-    long *topo = sbrk(0)
+    long *topo = sbrk(0);
     long *temp = prevAlloc;
     long retry = 0L;
 
@@ -167,7 +166,7 @@ void *nextFit(int num_bytes)
 
 int liberaMem(void *block)
 {
-    long *topo = sbrk(0)
+    long *topo = sbrk(0);
     long *temp = block;
     int ret = 0;
 
@@ -181,15 +180,15 @@ int liberaMem(void *block)
     long *next = (long *)((char *)prev + 16 + prev[1]);
     while (next != topo)
     {
-        int x = 0;
+        int flag = 0;
         while (prev[0] == 0L && next[0] == 0L && next != topo)
         {
             prev[1] = prev[1] + next[1] + 16;
             next = (long *)((char *)prev + 16 + prev[1]);
-            x = 1;
+            flag = 1;
         }
         prev = next;
-        if (x == 0)
+        if (flag == 0)
             next = (long *)((char *)prev + 16 + prev[1]);
     }
 

@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 static void *topoInicialHeap; // Ponteiro para topo da Heap
-static long *prevAlloc;       // Memória alocada anteriormente, utilizado no next fit
+static long *prevAlloc;       // Ponteiro para Memória alocada anteriormente, utilizado no next fit
 
 #define INCREMENT 4096
 #define HEADER_SIZE 16
@@ -26,6 +26,7 @@ void *bestFit(long int num_bytes)
     long int *a = topoInicialHeap;
     void *topoAtual = sbrk(0);
 
+    // Percorre a list de blocos para encontrar bloco que atenda o quesito
     while (a != topoAtual)
     {
         if (a[0] == 0)
@@ -42,11 +43,12 @@ void *bestFit(long int num_bytes)
         a += 2 + (a[1] / 8);
     }
 
-   if(topoInicialHeap + num_bytes > topoAtual)
-   {
+    // Se não encontrar, aloca mais memória necessária usando múltiplos de 4096
+    if (topoInicialHeap + num_bytes > topoAtual)
+    {
         int alocaTrue = topoAtual - topoInicialHeap;
         alocaTrue = num_bytes - alocaTrue;
-        int valorsbrk = ((alocaTrue/4096) + 1)*4096;
+        int valorsbrk = ((alocaTrue / 4096) + 1) * 4096;
         sbrk(valorsbrk);
         sbrk(0);
     }
@@ -54,14 +56,14 @@ void *bestFit(long int num_bytes)
     if (!bestfit)
     {
         long int *info;
-        // abre 8 bytes para um long que indica se o bloco esta ocupado
+        // Abre 8 bytes para um long que indica se o bloco esta ocupado
         info = sbrk(0);
         info[0] = 1;
-        // abre outros 8 bytes para guardar o tamanho do bloco
+        // Abre outros 8 bytes para guardar o tamanho do bloco
         info[1] = num_bytes;
-        // aloca o espaco necessario do bloco
+        // Aloca o espaco necessario do bloco
         void *endereco = &info[2];
-        topoHeapHeap += num_bytes + (2*8);
+        topoHeapHeap += num_bytes + (2 * 8);
         return ((char *)endereco);
     }
     else

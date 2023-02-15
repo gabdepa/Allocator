@@ -5,11 +5,12 @@
 
 int main()
 {
-  void *a_ff, *b_ff, *c_ff; // ponteiros para alocação First Fit 
-  void *d_nf, *e_nf, *f_nf; // ponteiros para alocação Next Fit 
+  void *a_ff, *b_ff, *c_ff; // ponteiros para alocação First Fit
+  void *d_nf, *e_nf, *f_nf; // ponteiros para alocação Next Fit
   void *g_bf, *h_bf, *i_bf; // ponteiros para alocação Best Fit
+  void *j_al, *k_al, *l_al; // ponteiros para alocação Best Fit
 
-  //Estado inicial
+  // Estado inicial
   printf("Estado Inicial:\n");
   iniciaAlocador();
   printMapa();
@@ -32,6 +33,15 @@ int main()
   f_nf = (void *)nextFit(40);
   printMapa();
 
+  // Alocador V2
+  printf("ALOCADOR V2:\n");
+  j_al = (void *)alocadorV2(50);
+  printMapa();
+  k_al = (void *)alocadorV2(90);
+  printMapa();
+  l_al = (void *)alocadorV2(40);
+  printMapa();
+
   // Best Fit
   printf("BEST FIT:\n");
   g_bf = (void *)bestFit(50);
@@ -41,7 +51,6 @@ int main()
   i_bf = (void *)bestFit(40);
   printMapa();
 
-  
   // Voltando ao Estado inicial
   liberaMem(a_ff);
 
@@ -60,6 +69,12 @@ int main()
   liberaMem(h_bf);
 
   liberaMem(i_bf);
+
+  liberaMem(j_al);
+
+  liberaMem(k_al);
+
+  liberaMem(l_al);
 
   printf("Estado Final:\n");
   printMapa();

@@ -19,22 +19,26 @@ void finalizaAlocador(void)
     brk(topoInicialHeap);
 }
 
-void *alocadorV2(long int num_bytes){
+void *alocadorV2(long int num_bytes)
+{
     long int *temp = topoInicialHeap;
     void *topoAtual = sbrk(0);
-    while(temp != topoAtual){
-        if(temp[0] == 0){ //bloco esta livre
-            if(temp[1] >= num_bytes){ //e cabe
+    while (temp != topoAtual)
+    {
+        if (temp[0] == 0)
+        { // bloco esta livre
+            if (temp[1] >= num_bytes)
+            { // e cabe
                 long int *info;
                 // abre 8 bytes para um long que indica se o bloco esta ocupado
-                temp[0] = 1; 
+                temp[0] = 1;
                 // abre outros 8 bytes para guardar o tamanho do bloco
-                // a[1] = num_bytes; 
+                // a[1] = num_bytes;
                 // aloca o espaco necessario do bloco
-                return ((char*)&temp[2]);
+                return ((char *)&temp[2]);
             }
         }
-        temp += 2 + (temp[1]/8);
+        temp += 2 + (temp[1] / 8);
     }
     long int *info;
     // abre 8 bytes para um long que indica se o bloco esta ocupado
@@ -45,7 +49,7 @@ void *alocadorV2(long int num_bytes){
     *info = num_bytes;
     // aloca o espaco necessario do bloco
     void *endereco = sbrk(num_bytes);
-    return ((char*)endereco);
+    return ((char *)endereco);
 }
 
 void *bestFit(long int num_bytes)
@@ -54,8 +58,6 @@ void *bestFit(long int num_bytes)
     long int bftam = 0xffffff;
     long int *a = topoInicialHeap;
     void *topoAtual = sbrk(0);
-
-    // Percorre a list de blocos para encontrar bloco que atenda o quesito
     while (a != topoAtual)
     {
         if (a[0] == 0)
@@ -71,28 +73,17 @@ void *bestFit(long int num_bytes)
         }
         a += 2 + (a[1] / 8);
     }
-
-    // Se não encontrar, aloca mais memória necessária usando múltiplos de 4096
-    if (topoInicialHeap + num_bytes > topoAtual)
-    {
-        int alocaTrue = topoAtual - topoInicialHeap;
-        alocaTrue = num_bytes - alocaTrue;
-        int valorsbrk = ((alocaTrue / 4096) + 1) * 4096;
-        sbrk(valorsbrk);
-        sbrk(0);
-    }
-
     if (!bestfit)
     {
         long int *info;
-        // Abre 8 bytes para um long que indica se o bloco esta ocupado
-        info = sbrk(0);
-        info[0] = 1;
-        // Abre outros 8 bytes para guardar o tamanho do bloco
-        info[1] = num_bytes;
-        // Aloca o espaco necessario do bloco
-        void *endereco = &info[2];
-        brk((char *)topoAtual + 16 + num_bytes); //aloca espaco para indicar tamanho e estado do bloco
+        // abre 8 bytes para um long que indica se o bloco esta ocupado
+        info = (long int *)sbrk(8);
+        *info = 1;
+        // abre outros 8 bytes para guardar o tamanho do bloco
+        info = (long int *)sbrk(8);
+        *info = num_bytes;
+        // aloca o espaco necessario do bloco
+        void *endereco = sbrk(num_bytes);
         return ((char *)endereco);
     }
     else
@@ -185,7 +176,7 @@ void *nextFit(long int num_bytes)
     topo[0] = 1L;
     topo[1] = num_bytes;
 
-    prevAlloc = (long *)((char *)topo + 16 + num_bytes); 
+    prevAlloc = (long *)((char *)topo + 16 + num_bytes);
 
     return &topo[2];
 }
@@ -230,6 +221,7 @@ void printMapa(void)
 
     while (count != topoAtual)
     {
+        printf("################");
         if (count[0] == 1)
             c = '+'; // ocupado
         else

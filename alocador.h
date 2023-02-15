@@ -42,35 +42,45 @@ void printMapa(void);
 
 /**
  * @brief Implementa o Next Fit, alocando um bloco de "num_bytes"
- * 
+ *
  * 1)Procura um bloco livre com tamanho maior ou igual a "num_bytes"
  * 2)Se encontrar, indica que o bloco está ocupado e retorna o endereço inicial do bloco
  * 3)Se não encontrar, abre espaço para um novo bloco usando a syscall brk, indica que o bloco está ocupado e retorna o endereço inicial do bloco.
  * @param num_bytes Quantidade de bytes a ser alocado
- * @return Endereço do novo bloco alocado 
-*/
+ * @return Endereço do novo bloco alocado
+ */
 void *nextFit(long int num_bytes);
 
 /**
  * @brief Implementa o First Fit, alocando um bloco de "num_bytes"
- * 
+ *
  * 1. Procura um bloco livre com tamanho maior ou igual a `num_bytes`
  * 2. Se encontrar, indica que o bloco está ocupado e retorna o endereço inicial do bloco
  * 3. Se não encontrar, abre espaço para um novo bloco usando a syscall brk, indica que o bloco está ocupado e retorna o endereço inicial o bloco.
  * @param num_bytes Quantidade de bytes a ser alocado
- * @return Endereço do novo bloco alocado 
-*/
+ * @return Endereço do novo bloco alocado
+ */
 void *firstFit(long int num_bytes);
-
 
 /**
  * @brief Implementa o Best Fit, alocando um bloco de "num_bytes"
- * 
+ *
  * 1. Procura um bloco livre com tamanho maior ou igual a `num_bytes`
  * 2. Se encontrar, indica que o bloco está ocupado e retorna o endereço inicial do bloco
  * 3. Se não encontrar, abre espaço para um novo bloco usando a syscall brk, indica que o bloco está ocupado e retorna o endereço inicial o bloco.
  * @param num_bytes Quantidade de bytes a ser alocado
- * @return Endereço do novo bloco alocado 
+ * @return Endereço do novo bloco alocado
  */
 void *bestFit(long int num_bytes);
+
+/**
+ * @brief Implementa o Alocador Tradicional, alocando um bloco de "num_bytes"
+ *
+ * 1. Procura um bloco livre com tamanho maior ou igual a `num_bytes`
+ * 2. Se encontrar, indica que o bloco está ocupado e retorna o endereço inicial do bloco
+ * 3. Se não encontrar, abre espaço para um novo bloco usando a syscall brk, indica que o bloco está ocupado e retorna o endereço inicial o bloco.
+ * @param num_bytes Quantidade de bytes a ser alocado
+ * @return Endereço do novo bloco alocado
+ */
+void *alocadorV2(long int num_bytes);
 #endif

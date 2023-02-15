@@ -12,6 +12,7 @@
 .globl prevAlloc
 
     str_init:           .string "Init printf() heap arena\n"
+    str_cabc:           .string "################"
     plus_char:          .byte 43
     minus_char:         .byte 45
 
@@ -311,7 +312,7 @@ alocadorV2:
 
     v2_w0: 
         cmpq %r10 , topoAtualHeap # compara o topo inicial (r10) com o topo atual (rax)
-        je v2_fim_w0
+        je v2_fim_w0              # fim do loop, não tinha um espaço disponivel, é necessário alocar um novo
 
         mov (%r10), %r15          # bloco de "livre ou não"  -> r15
         cmp $0    , %r15          # se ocupado, procura proximo bloco
@@ -346,8 +347,8 @@ alocadorV2:
 
         jmp v2_w0
 
-    v2_fim_w0:
     # Não tinha um espaço disponivel, é necessário alocar um novo
+    v2_fim_w0:
 
     mov  $12, %rax               # codigo referente ao brk
     mov  $0 , %rdi               # 0 para retornar o topo da heap
@@ -371,15 +372,10 @@ alocadorV2:
     mov %r15     , %rax
     add $8       , %rax
 
-    fim_aloc:
+    v2_fim_aloc:
     popq %rbp
 
     ret
-
-
-
-
-
 
 
 
@@ -396,7 +392,7 @@ bestFit:
 
     movq topoAlocado, %rbx
 
-    bf_w0: 
+    w0: 
         cmpq %r12 , topoAlocado           # compara o topo inicial com o topo atual já alocado
         je fim_w0
         
@@ -404,37 +400,37 @@ bestFit:
 
         mov (%r12), %r15                  # bloco de "livre ou não"  -> r15
         cmp $0    , %r15                  # se ocupado, procura proximo bloco
-        jne bf_prox_bloc_1                   # pula para o próximo bloco
+        jne prox_bloc_1                   # pula para o próximo bloco
 
         add $8       , %r12               # vai para o espaço do tamanho
         mov (%r12)   , %r15               # salva o tamanho em r15
         cmpq tamAloc , %r15               # compara se o espaço disponivel é suficiente
-        jl  bf_prox_bloc_2                   # pula para o próximo bloco
+        jl  prox_bloc_2                   # pula para o próximo bloco
 
         cmp tamanhoBestFit, %r15          # comparo para ver se o tamanho atual é o ideal
-        jge bf_prox_bloc_2                   # se nao for, procuro o proximo bloco
+        jge prox_bloc_2                   # se nao for, procuro o proximo bloco
 
         movq %r14, enderecoBestFit        # salva o endereço do bloco ideal
         movq %r15, tamanhoBestFit         # salva o tamanho  do bloco ideal
         
-        jmp bf_prox_bloc_2                   # pula para o proximo bloco
+        jmp prox_bloc_2                   # pula para o proximo bloco
 
-        bf_prox_bloc_1:                      # aqui o loop morreu lgo no começo
+        prox_bloc_1:                      # aqui o loop morreu lgo no começo
         add $8       , %r12               #  entao é preciso add 8 agora e mais 8
         mov (%r12)   , %r15               #  daqui a pouco pra fechar o cabeçalho
 
-        bf_prox_bloc_2:                      # aqui é se só nao tem tamanho o suficiente
+        prox_bloc_2:                      # aqui é se só nao tem tamanho o suficiente
         add $8       , %r12               # soma os 8 restantes
 
         add %r15     , %r12               # e soma o tamanho do bloco que foi analizado
 
         jmp w0                            # volta para o inicio do loop
 
-    bf_fim_w0:
+    fim_w0:
 
     mov $0  , %r13                        # move 0 para r13
     cmp %r13, enderecoBestFit             # compara o enderecoBestFit com 0
-    je bf_inicio_alocacao                    # se forem iguais, inicia uma nova alocação
+    je inicio_alocacao                    # se forem iguais, inicia uma nova alocação
                                           # senão, usa o endereco salvo em enderecoBestFit
 
     # Achou o melhor lugar para armazenar os novos dados sem a necessidade de uma nova alocação
@@ -449,9 +445,9 @@ bestFit:
 
 
 
-    jmp bf_fim_aloc                      # pula para o fim da alocação
+    jmp fim_aloc                      # pula para o fim da alocação
 
-    bf_inicio_alocacao:
+    inicio_alocacao:
     # Não tinha um espaço disponivel, confere se pode botar no final do espaço já alocado
 
     # se ((tamanho + 16) > (topoAtualHeap - topoAlocado)) -> aloca
@@ -469,7 +465,7 @@ bestFit:
     add  $16          , %rbx     # adiciona os 16 bytes de cabeçalho
 
     cmp %rax          , %rbx     # ve se tem espaço disponivel sem a necessidade 
-    jle bf_nao_aloca_4096           #  de fazer uma nova alocação de tamanho = blockSize
+    jle nao_aloca_4096           #  de fazer uma nova alocação de tamanho = blockSize
 
                                  # foi necessária a alocação
     movq %rbx  , %r12            # joga o tamanho que eu quero alocar em r12
@@ -516,7 +512,7 @@ bestFit:
 
     popq %rbp
 
-    ret
+ret
 
 
 
@@ -641,6 +637,11 @@ printMapa:
         movq -16(%rbp), %rbx
         cmpq %rbx, %rax             # while (count != topoAtual)
         je fim_while5
+
+        # print '################'
+        movq $0, %rax
+        movq $str_cabc, %rdi
+        call printf
 
         # condicional e loop p/ printar caracteres '+' ou '-'
         movq -8(%rbp), %rax         # rax := count

@@ -2,10 +2,8 @@
 #include <unistd.h>
 #include <stdbool.h>
 
-
 static void *topoInicialHeap; // Ponteiro para topo da Heap
 static long *prevAlloc;       // Memória alocada anteriormente, utilizado no next fit
-void *topoBlocos;             // Cabeçalho dos Blocos
 
 #define INCREMENT 4096
 #define HEADER_SIZE 16
@@ -27,56 +25,48 @@ void *bestFit(long int num_bytes)
     if (num_bytes <= 0)
         return NULL;
 
-    long int bestFit = 0;
-    long int *cabecalho;
-    void *iterator = topoInicialHeap;
-    void *comecoBloco = topoBlocos;
+    long bestFit = 0L;
+
+    void *temp = topoInicialHeap;
+    long *topo = sbrk(0);
+    void *block_start = topo;
     long int *isDisp;
-    long int disp;
     long int mult;
     long int excesso;
-    long int *bloco;
 
-    sbrk(24);
-
-    // Procura bloco livre para ser alocado
-    while (iterator < topoBlocos)
+    // Percorre a Heap procurando bloco livre, respeitando best fit, para ser alocado
+    while (temp < topo)
     {
-        cabecalho = iterator;
-        if (!cabecalho[0] && (cabecalho[1] >= num_bytes) && ((cabecalho[1] < bestFit) || !bestFit))
+        if (!temp[0] && (temp[1] >= num_bytes) && ((temp[1] < bestFit) || !bestFit))
         {
-            bestFit = cabecalho[1];
-            comecoBloco = iterator;
+            bestFit = temp[1];
+            block_start = temp;
         }
-        iterator += 16 + cabecalho[1];
+        temp = (long *)((char *)temp + 16 + temp[1]);
     }
 
-    // Retorna caso algum bloco livre foi achado
+    // Retorna endereço(ponteiro) caso algum bloco livre foi achado atendendo os quesitos
     if (bestFit)
     {
-        isDisp = comecoBloco;
+        isDisp = block_start;
         *isDisp = 1;
-        return comecoBloco + 16;
+        return block_start + 16;
     }
 
     // Aloca quanta memória a mais for necessária
-    disp = sbrk(0) - topoBlocos;
-    if (16 + num_bytes > disp)
+    if ((16 + num_bytes) > (sbrk(0) - topo))
     {
-        excesso = 16 + num_bytes - disp;
+        excesso = 16 + num_bytes - (sbrk(0) - topo);
         mult = 1 + ((excesso - 1) / 4096); // utiliza blocos de 4096 bytes, especificação 6.2c
         sbrk(4096 * mult);                 // aloca bloco de tamanho 4096*n
     }
 
-    // Insere cabeçalho do bloco
-    bloco = topoBlocos;
-    bloco[0] = 1;
-    bloco[1] = num_bytes;
+    // Sinaliza como ocupado e armazena tam de memória a ser alocado
+    brk((char *)topo + 16 + num_bytes);
+    topo[0] = 1L;
+    topo[1] = num_bytes;
 
-    // Atualiza variável topoBlocos
-    topoBlocos += 16 + num_bytes;
-
-    return (void *)bloco + 16;
+    return &topo[2];
 }
 
 void *firstFit(int num_bytes)
@@ -205,11 +195,10 @@ void printMapa(void)
 
     while (count != topoAtual)
     {
-        printf("################");
         if (count[0] == 1)
             c = '+'; // ocupado
         else
-            c = '-'; //livre
+            c = '-'; // livre
         for (int i = 0; i < count[1]; i++)
             putchar(c);
 

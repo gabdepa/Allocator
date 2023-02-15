@@ -39,7 +39,7 @@ int liberaMem(void *block);
  * com o caracter "#". O caracter usado para
  * a impressão dos bytes do bloco de cada nó depende
  * se o bloco estiver livre ou ocupado. Se estiver livre, imprime o
- * caractere "F". Se estiver ocupado, imprime o caractere "O".
+ * caractere "-". Se estiver ocupado, imprime o caractere "+".
  */
 void printMapa(void);
 
@@ -64,6 +64,12 @@ void *nextFit(int num_bytes);
  * @return Endereço do novo bloco alocado 
 */
 void *firstFit(int num_bytes);
+
+
+
+
+
+
 
 void *bestFit(long int num_bytes);
 #endif

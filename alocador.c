@@ -1,17 +1,18 @@
-#include <stdbool.h>
-#include <unistd.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <stdbool.h>
 
-static void *topoInicialHeap;
-static long *prevAlloc; // utilizado no next fit
-void *topoBlocos;
+
+static void *topoInicialHeap; // Ponteiro para topo da Heap
+static long *prevAlloc;       // Memória alocada anteriormente, utilizado no next fit
+void *topoBlocos;             // Cabeçalho dos Blocos
 
 #define INCREMENT 4096
 #define HEADER_SIZE 16
 
 void iniciaAlocador(void)
 {
-    printf("Init printf() heap arena\n");
+    printf("Init HEAP...\n");
     prevAlloc = topoInicialHeap = sbrk(0);
 }
 
@@ -196,7 +197,7 @@ int liberaMem(void *block)
     return ret;
 }
 
-void imprimeMapa(void)
+void printMapa(void)
 {
     long *count = topoInicialHeap;
     void *topoAtual = sbrk(0);
@@ -206,14 +207,15 @@ void imprimeMapa(void)
     {
         printf("################");
         if (count[0] == 1)
-            c = 'O';
+            c = '*'; // ocupado
         else
-            c = 'F';
+            c = '~'; //livre
         for (int i = 0; i < count[1]; i++)
             putchar(c);
 
         count = (long *)((char *)count + 16 + count[1]);
     }
+
     putchar('\n');
     putchar('\n');
 }

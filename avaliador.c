@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <unistd.h>
+#include <stdbool.h>
 #include "alocador.h"
 
 int main()
@@ -7,43 +9,40 @@ int main()
 
   // 0) Estado inicial
   iniciaAlocador();
-  imprimeMapa();
+  printMapa();
 
-  // 1) Espero ver quatro segmentos ocupados
+  // First Fit
+  printf("FIRST FIT:\n");
   a = (void *)firstFit(100);
-  // imprimeMapa();
   b = (void *)firstFit(130);
-  // imprimeMapa();
   c = (void *)firstFit(120);
-  // imprimeMapa();
   d = (void *)firstFit(110);
-  imprimeMapa();
+  printMapa();
 
-  // 2) Espero ver quatro segmentos alternando  ocupados e livres
+  // Vizualiação da Heap
   liberaMem(b);
-  imprimeMapa();
+  printMapa();
   liberaMem(d);
-  imprimeMapa();
+  printMapa();
 
-  // 3) Deduzam
-  b = (void *)firstFit(50);
-  imprimeMapa();
-  d = (void *)firstFit(90);
-  imprimeMapa();
-  e = (void *)firstFit(40);
-  imprimeMapa();
+  // Next Fit
+  printf("NEXT FIT:\n");
+  b = (void *)nextFit(50);
+  d = (void *)nextFit(90);
+  e = (void *)nextFit(40);
+  printMapa();
 
-  // 4) Volta ao estado inicial
+  // Voltando ao Estado inicial
   liberaMem(c);
-  imprimeMapa();
+  printMapa();
   liberaMem(a);
-  imprimeMapa();
+  printMapa();
   liberaMem(b);
-  imprimeMapa();
+  printMapa();
   liberaMem(d);
-  imprimeMapa();
+  printMapa();
   liberaMem(e);
-  imprimeMapa();
+  printMapa();
 
   finalizaAlocador();
 }

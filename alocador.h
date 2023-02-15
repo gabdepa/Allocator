@@ -1,4 +1,3 @@
-
 #ifndef __ALOCADOR__
 #define __ALOCADOR__
 
@@ -6,7 +5,7 @@
 // #define HEADER_SIZE 16
 // void *topoInicialHeap;
 // void *topoBlocos;
-// static long *prevAlloc; // utilizado no next fit
+// static long *prevAlloc;
 
 /**
  * @brief Inicialização do Alocador
@@ -42,20 +41,29 @@ int liberaMem(void *block);
  * se o bloco estiver livre ou ocupado. Se estiver livre, imprime o
  * caractere "F". Se estiver ocupado, imprime o caractere "O".
  */
-void imprimeMapa(void);
-
-void *bestFit(long int num_bytes);
-void *firstFit(int num_bytes);
+void printMapa(void);
 
 /**
- * @brief Implemente o Next Fit, alocando um bloco de "num_bytes"
+ * @brief Implementa o Next Fit, alocando um bloco de "num_bytes"
  * 
  * 1)Procura um bloco livre com tamanho maior ou igual a "num_bytes"
  * 2)Se encontrar, indica que o bloco está ocupado e retorna o endereço inicial do bloco
  * 3)Se não encontrar, abre espaço para um novo bloco usando a syscall brk, indica que o bloco está ocupado e retorna o endereço inicial do bloco.
  * @param num_bytes Quantidade de bytes a ser alocado
  * @return Endereço do novo bloco alocado 
- */
+*/
 void *nextFit(int num_bytes);
 
+/**
+ * @brief Implementa o First Fit, alocando um bloco de "num_bytes"
+ * 
+ * 1. Procura um bloco livre com tamanho maior ou igual a `num_bytes`
+ * 2. Se encontrar, indica que o bloco está ocupado e retorna o endereço inicial do bloco
+ * 3. Se não encontrar, abre espaço para um novo bloco usando a syscall brk, indica que o bloco está ocupado e retorna o endereço inicial o bloco.
+ * @param num_bytes Quantidade de bytes a ser alocado
+ * @return Endereço do novo bloco alocado 
+*/
+void *firstFit(int num_bytes);
+
+void *bestFit(long int num_bytes);
 #endif

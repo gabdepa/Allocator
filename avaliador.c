@@ -7,7 +7,7 @@ int main()
 {
   void *a_ff, *b_ff, *c_ff; // ponteiros para alocação First Fit
   void *d_nf, *e_nf, *f_nf; // ponteiros para alocação Next Fit
-  void *g_al, *h_al, *i_al; // ponteiros para alocação Best Fit
+  void *g_al, *h_al, *i_al; // ponteiros para alocação Alocador V2
   void *j_bf, *k_bf, *l_bf; // ponteiros para alocação Best Fit
 
   // Estado inicial

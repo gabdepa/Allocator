@@ -11,8 +11,8 @@ int main()
   void *j_bf, *k_bf, *l_bf; // ponteiros para alocação Best Fit
 
   // Estado inicial
-  printf("Estado Inicial:\n");
   iniciaAlocador();
+  printf("Estado Inicial:\n");
   printMapa();
 
   // First Fit

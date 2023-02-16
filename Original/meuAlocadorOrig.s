@@ -5,8 +5,6 @@
     str_cabc:           .string "################"
     plus_char:          .byte 43
     minus_char:         .byte 45
-
-    
    
 .globl topoInicialHeap
 .globl prevAlloc  
@@ -46,6 +44,90 @@ finalizaAlocador:
 
     popq %rbp
 
+    ret
+
+.globl liberaMem
+liberaMem:
+    pushq %rbp
+    movq  %rsp, %rbp
+
+    sub $16  , %rdi       # Vai para o lugar que indica se está alocado ou não trata[-2]
+    mov $0   , %r14 
+    mov %r14 ,(%rdi)      # Coloca zero, trata[-2] = 0
+    mov $1, %rax          # Sucesso ao liberar bloco
+
+    popq %rbp
+    ret
+
+.globl imprimeMapa
+imprimeMapa:
+    pushq %rbp
+    movq %rsp, %rbp
+
+    # -8(%rbp) := count 
+    # -16(%rbp) := topoAtual
+    # -24(%rbp) := c
+    subq $24, %rsp 
+
+    movq topoInicialHeap, %rax
+    movq %rax, -8(%rbp)             # count := topoInicialHeap
+
+    movq $0, %rdi                   # primeiro parâmetro brk
+    movq $12, %rax                  # No de syscall do brk
+    syscall                         # brk(0)
+    movq %rax, -16(%rbp)            # topoAtual := sbrk(0)
+
+    while5:
+        movq -8(%rbp), %rax
+        movq -16(%rbp), %rbx
+        cmpq %rbx, %rax             # while (count != topoAtual)
+        je fim_while5
+
+        # print '################'
+        movq $0, %rax
+        movq $str_cabc, %rdi
+        call printf
+
+        # condicional e loop p/ printar caracteres '+' ou '-'
+        movq -8(%rbp), %rax         # rax := count
+        cmpq $1, (%rax)
+        jne minus_sign              # se count[0] == 0 vai pra minus_sign
+        mov plus_char, %r10         # r10 = '+'
+        jmp for1_set
+        minus_sign:
+        mov minus_char, %r10        # r10 = '-'
+
+        for1_set:
+            movq $0, %r11           # r11 := i = 0
+            movq -8(%rbp), %rax     # rax := count
+            movq 8(%rax), %r12      # r12 := count[1]
+        for1:
+            cmpq %r12, %r11         # for (int i = 0; i < count[1]; i++)
+            jge fim_for1
+
+            movq %r10, %rdi
+            call putchar            # printa + ou -
+
+            addq $1, %r11           # i++
+
+            jmp for1
+        fim_for1:
+
+        movq -8(%rbp), %rax         # rax := count
+        addq 8(%rax), %rax          # rax := count + count[1]
+        addq $16, %rax              # rax := count + count[1] + 16
+        movq %rax, -8(%rbp)         # count := (long *)((char *)count + a[1] + 16)
+
+        jmp while5
+    fim_while5:
+
+    movq $10, %rdi                  # char de fim de linha
+    call putchar
+    movq $10, %rdi                  # char de fim de linha
+    call putchar
+
+    addq $24, %rsp
+    popq %rbp
     ret
 
 .globl nextFit
@@ -158,86 +240,3 @@ nextFit:
     popq %rbp
     ret                             # return &topo[2]
 
-.globl liberaMem
-liberaMem:
-    pushq %rbp
-    movq  %rsp, %rbp
-
-    sub $16  , %rdi       # Vai para o lugar que indica se está alocado ou não trata[-2]
-    mov $0   , %r14 
-    mov %r14 ,(%rdi)      # Coloca zero, trata[-2] = 0
-    mov $1, %rax          # Sucesso ao liberar bloco
-
-    popq %rbp
-    ret
-
-.globl imprimeMapa
-imprimeMapa:
-    pushq %rbp
-    movq %rsp, %rbp
-
-    # -8(%rbp) := count 
-    # -16(%rbp) := topoAtual
-    # -24(%rbp) := c
-    subq $24, %rsp 
-
-    movq topoInicialHeap, %rax
-    movq %rax, -8(%rbp)             # count := topoInicialHeap
-
-    movq $0, %rdi                   # primeiro parâmetro brk
-    movq $12, %rax                  # No de syscall do brk
-    syscall                         # brk(0)
-    movq %rax, -16(%rbp)            # topoAtual := sbrk(0)
-
-    while5:
-        movq -8(%rbp), %rax
-        movq -16(%rbp), %rbx
-        cmpq %rbx, %rax             # while (count != topoAtual)
-        je fim_while5
-
-        # print '################'
-        movq $0, %rax
-        movq $str_cabc, %rdi
-        call printf
-
-        # condicional e loop p/ printar caracteres '+' ou '-'
-        movq -8(%rbp), %rax         # rax := count
-        cmpq $1, (%rax)
-        jne minus_sign              # se count[0] == 0 vai pra minus_sign
-        mov plus_char, %r10         # r10 = '+'
-        jmp for1_set
-        minus_sign:
-        mov minus_char, %r10        # r10 = '-'
-
-        for1_set:
-            movq $0, %r11           # r11 := i = 0
-            movq -8(%rbp), %rax     # rax := count
-            movq 8(%rax), %r12      # r12 := count[1]
-        for1:
-            cmpq %r12, %r11         # for (int i = 0; i < count[1]; i++)
-            jge fim_for1
-
-            movq %r10, %rdi
-            call putchar            # printa + ou -
-
-            addq $1, %r11           # i++
-
-            jmp for1
-        fim_for1:
-
-        movq -8(%rbp), %rax         # rax := count
-        addq 8(%rax), %rax          # rax := count + count[1]
-        addq $16, %rax              # rax := count + count[1] + 16
-        movq %rax, -8(%rbp)         # count := (long *)((char *)count + a[1] + 16)
-
-        jmp while5
-    fim_while5:
-
-    movq $10, %rdi                  # char de fim de linha
-    call putchar
-    movq $10, %rdi                  # char de fim de linha
-    call putchar
-
-    addq $24, %rsp
-    popq %rbp
-    ret

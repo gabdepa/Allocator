@@ -3,15 +3,11 @@
 #include <stdbool.h>
 
 static void *topoInicialHeap; // Ponteiro para topo da Heap
-static long *prevAlloc;       // Ponteiro para Memória alocada anteriormente, utilizado no next fit
-
-#define INCREMENT 4096
-#define HEADER_SIZE 16
 
 void iniciaAlocador(void)
 {
     printf("Init HEAP...\n");
-    prevAlloc = topoInicialHeap = sbrk(0);
+    topoInicialHeap = sbrk(0);
 }
 
 void finalizaAlocador(void)
@@ -22,42 +18,42 @@ void finalizaAlocador(void)
 void *alocaMem(long int num_bytes)
 {
     long *topo = sbrk(0);
-    long *temp = prevAlloc;
-    long retry = 0L;
+    long *temp = topoInicialHeap;
+    long *maior = temp;
 
-    // Percorre a lista de blocos 2 vezes
-    while (retry <= 1)
+    // Seleciona primeiro bloco livre como maior
+    while (temp != topo && (maior[0] == 1 && temp[0] == 1))
+        temp = (long *)((char *)temp + 16 + temp[1]);
+    maior = temp;
+
+    // Itera a heap em busca do maior bloco até o fim
+    while (temp != topo)
     {
-        while (temp != topo)
+        if (temp[0] == 0L && temp[1] > maior[1])
+            maior = temp;
+        temp = (long *)((char *)temp + 16 + temp[1]);
+    }
+
+    // Aloca o bloco de tam num_bytes no 'maior' e se sobrar espaço particiona o bloco para que ocorra posterior fusao//
+    if (maior != topo && (maior[1] >= num_bytes + 16))
+    {
+        maior[0] = 1L;
+        // Verifica se é possível particionar o bloco
+        if (maior[1] >= num_bytes + 16)
         {
-            if (temp[0] == 0L && temp[1] >= num_bytes)
-            {
-                temp[0] = 1L;
+            long *novoBloco = (long *)((char *)maior + 16 + num_bytes);
+            novoBloco[0] = 0L;
+            novoBloco[1] = maior[1] - num_bytes - 16; // utiliza o restante da memoria nao utiliza para criar um novo bloco tal que consiga efetuar a fusao depois
 
-                // Verifica se é possível particionar o bloco
-                if (temp[1] >= num_bytes + 16)
-                {
-                    long *novoBloco = (long *)((char *)temp + 16 + num_bytes);
-                    novoBloco[0] = 0L;
-                    novoBloco[1] = temp[1] - num_bytes - 16;
-
-                    temp[1] = num_bytes;
-                }
-                prevAlloc = (long *)((char *)temp + 16 + temp[1]);
-                return &temp[2];
-            }
-            temp = (long *)((char *)temp + 16 + temp[1]);
+            maior[1] = num_bytes;
         }
-        temp = topoInicialHeap;
-        ++retry;
+        return &maior[2];
     }
 
     // Sinaliza como ocupado e armazena tam de memória a ser alocado
     brk((char *)topo + 16 + num_bytes);
     topo[0] = 1L;
     topo[1] = num_bytes;
-
-    prevAlloc = (long *)((char *)topo + 16 + num_bytes);
 
     return &topo[2];
 }
@@ -74,23 +70,24 @@ int liberaMem(void *block)
         ret = 1;
     }
 
-    long *prev = topoInicialHeap;
-    long *next = (long *)((char *)prev + 16 + prev[1]);
+    // Organiza os blocos
+    long *prev = topoInicialHeap; // Pega o primeiro bloco da heap
+    long *next = (long *)((char *)prev + 16 + prev[1]); // Pega o próximo bloco depois do inicial
     while (next != topo)
     {
         int flag = 0;
-        while (prev[0] == 0L && next[0] == 0L && next != topo)
+        while (prev[0] == 0L && next[0] == 0L && next != topo) // verifica se ambos estiverem livre e se o proximo nao eh o topo
         {
-            prev[1] = prev[1] + next[1] + 16;
-            next = (long *)((char *)prev + 16 + prev[1]);
-            flag = 1;
-        }
-        prev = next;
-        if (flag == 0)
-            next = (long *)((char *)prev + 16 + prev[1]);
+            // entao unifico blocos
+            prev[1] = prev[1] + next[1] + 16; // Soma de tamanhos de prev e next
+            next = (long *)((char *)prev + 16 + prev[1]); // bloco next adiciona tamanho do bloco prev
+            flag = 1;  // Indica que ja foi unificado
+        } 
+        prev = next;  // Unifica blocos
+        if (flag == 0)  // Caso não tenha conseguido unificar
+            next = (long *)((char *)prev + 16 + prev[1]);  // bloco next adiciona tamanho do bloco prev
     }
 
-    // prevAlloc = (long *)(temp[-1] + (char *)temp);
     return ret;
 }
 
@@ -104,13 +101,13 @@ void imprimeMapa(void)
     {
         printf("################");
         if (count[0] == 1)
-            c = '+'; // ocupado
+            c = '+'; // bloco ocupado
         else
-            c = '-'; // livre
+            c = '-'; // bloco livre
         for (int i = 0; i < count[1]; i++)
             putchar(c);
-
-        count = (long *)((char *)count + 16 + count[1]);
+        
+        count = (long *)((char *)count + 16 + count[1]); // Pega o próximo bloco, count[1] guarda o número de bytes que o bloco ocupa
     }
 
     putchar('\n');

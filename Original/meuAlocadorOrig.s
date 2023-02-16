@@ -169,7 +169,7 @@ liberaMem:
     mov $1, %rax          # Sucesso ao liberar bloco
 
     popq %rbp
-
+    ret
 
 .globl imprimeMapa
 imprimeMapa:

@@ -221,11 +221,11 @@ int liberaMem(void *block)
             next = (long *)((char *)prev + 16 + prev[1]);
     }
 
-    prevAlloc = (long *)(temp[-1] + (char *)temp);
+    // prevAlloc = (long *)(temp[-1] + (char *)temp);
     return ret;
 }
 
-void printMapa(void)
+void imprimeMapa(void)
 {
     long *count = topoInicialHeap;
     void *topoAtual = sbrk(0);

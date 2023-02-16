@@ -599,8 +599,8 @@ liberaMem:
     popq %rbp
     ret                             # return ret
 
-.globl printMapa
-printMapa:
+.globl imprimeMapa
+imprimeMapa:
     pushq %rbp
     movq %rsp, %rbp
 

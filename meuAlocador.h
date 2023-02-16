@@ -38,7 +38,7 @@ int liberaMem(void *block);
  * se o bloco estiver livre ou ocupado. Se estiver livre, imprime o
  * caractere "-". Se estiver ocupado, imprime o caractere "+".
  */
-void printMapa(void);
+void imprimeMapa(void);
 
 /**
  * @brief Implementa o Next Fit, alocando um bloco de "num_bytes"

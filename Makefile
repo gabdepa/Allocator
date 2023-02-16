@@ -1,24 +1,19 @@
-CC ?= gcc
+CC = gcc
 
-OBJS := alocador.o
-MAIN ?= avaliador
 
-CFLAGS  += -Wall -Wextra -Wpedantic -g
-LDFLAGS += -no-pie
+SRCS = avaliador.c alocador.c 
+HDRS = alocador.h
 
-all: $(MAIN)
+alocador.o: alocador.c $(HDRS)
+	$(CC) -c alocador.c
 
-$(MAIN): $(MAIN).c $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+avaliador.o: avaliador.c $(HDRS)
+	$(CC) -c avaliador.c
 
-$(MAIN).c: ;
-
-.SUFFIXES:
-.SUFFIXES: .s .o
-.s.o: 
-	$(CC) -c $(CFLAGS) $< -o $@
+avaliador: avaliador.o alocador.o
+	$(CC)  avaliador.o alocador.o -o avaliador
 
 clean:
-	@ $(RM) *.o $(MAIN)
+	@ $(RM) *.o avaliador 
 
 .PHONY: clean

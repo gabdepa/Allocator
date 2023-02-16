@@ -13,43 +13,43 @@ int main()
   // Estado inicial
   iniciaAlocador();
   printf("Estado Inicial:\n");
-  printMapa();
+  imprimeMapa();
 
   // First Fit
   printf("FIRST FIT:\n");
   a_ff = (void *)firstFit(50);
-  printMapa();
+  imprimeMapa();
   b_ff = (void *)firstFit(90);
-  printMapa();
+  imprimeMapa();
   c_ff = (void *)firstFit(40);
-  printMapa();
+  imprimeMapa();
 
   // Next Fit
   printf("NEXT FIT:\n");
   d_nf = (void *)nextFit(50);
-  printMapa();
+  imprimeMapa();
   e_nf = (void *)nextFit(90);
-  printMapa();
+  imprimeMapa();
   f_nf = (void *)nextFit(40);
-  printMapa();
+  imprimeMapa();
 
   // Alocador V2
   printf("ALOCADOR V2:\n");
   g_al = (void *)alocadorV2(50);
-  printMapa();
+  imprimeMapa();
   h_al = (void *)alocadorV2(90);
-  printMapa();
+  imprimeMapa();
   i_al = (void *)alocadorV2(40);
-  printMapa();
+  imprimeMapa();
 
   // Best Fit
   printf("BEST FIT:\n");
   j_bf = (void *)bestFit(50);
-  printMapa();
+  imprimeMapa();
   k_bf = (void *)bestFit(90);
-  printMapa();
+  imprimeMapa();
   l_bf = (void *)bestFit(40);
-  printMapa();
+  imprimeMapa();
 
   // Voltando ao Estado inicial
   // Liberando Best Fit
@@ -57,31 +57,31 @@ int main()
   liberaMem(l_bf);
   liberaMem(k_bf);
   liberaMem(j_bf);
-  printMapa();
+  imprimeMapa();
 
   // Liberando Alocador V2
   printf("Liberando Alocador V2...\n");
   liberaMem(i_al);
   liberaMem(h_al);
   liberaMem(g_al);
-  printMapa();
+  imprimeMapa();
 
   // Liberando Next Fit
   printf("Liberando Next Fit...\n");
   liberaMem(f_nf);
   liberaMem(e_nf);
   liberaMem(d_nf);
-  printMapa();
+  imprimeMapa();
 
   // Liberando First Fit
   printf("Liberando First Fit...\n");
   liberaMem(c_ff);
   liberaMem(b_ff);
   liberaMem(a_ff);
-  printMapa();
+  imprimeMapa();
 
   printf("\nEstado Final:\n");
   finalizaAlocador();
-  printMapa();  
+  imprimeMapa();  
   return 0;
 }

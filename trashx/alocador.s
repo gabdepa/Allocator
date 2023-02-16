@@ -175,8 +175,7 @@ bestFit:
 
     fim_aloc:
     popq %rbp
-
-ret
+    ret
 
 
 .globl nextFit
@@ -184,7 +183,8 @@ nextFit:
     pushq %rbp
     movq %rsp, %rbp
 
-    # -8(%rbp) := topo ; -16(%rbp) := temp ;
+    # -8(%rbp) := topo ; 
+    # -16(%rbp) := temp ;
     # -24(%rbp) := retry ;
     # -32(%rbp) := novoBloco
     subq $32, %rsp 

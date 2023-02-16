@@ -1,10 +1,9 @@
 CC ?= gcc
 
-OBJS := meuAlocador.o
+OBJS := meuAlocadorOrig.o
 MAIN ?= avalia
 
-CFLAGS+=
-# += -Wall -Wextra -Wpedantic -g
+# CFLAGS += -Wall -Wextra -Wpedantic -g
 LDFLAGS += -no-pie
 
 all: $(MAIN)
